@@ -4,7 +4,7 @@
 
 const STORAGE_KEY = 'yoshiwara_shops_v1';
 
-// 🌟 直接將 JSON 資料寫入陣列
+// 🌟 直接將原 JSON 資料內嵌，徹底解決靜態 HTML 本地開啟時 fetch(shops.json) 的 CORS 阻擋限制
 const rawShopsData = [
   { "id": 1, "name": "西月", "type": "超高級店", "foreign": "❌ 不接待", "notes": "吉原三大名店之一，和式裝修，品質和服務極穩，安檢嚴格，黑服態度一般，不接待外國人", "url": "", "address": "" },
   { "id": 2, "name": "將軍", "type": "超高級店", "foreign": "—", "notes": "外觀平平無奇但價格昂貴（60分鐘入浴料需4萬9日元），完全預約制。老師招募極嚴格（排除抽菸、紋身、有疤痕及超過29歲的人）", "url": "", "address": "" },
@@ -127,7 +127,7 @@ let currentSort = { key: 'id', asc: true };
 let currentFilters = { type: '', foreign: '', search: '' };
 let currentShopId = null;
 
-// 外國人接待的排序權重 (數字越小排越前面)
+// 外國人接待的自訂排序權重 (數字越小排越前面)
 const foreignSortWeight = {
   "✅ 接待": 1,
   "❌ 不接待": 2,
@@ -247,9 +247,9 @@ function applyFilters() {
     let va = a[currentSort.key] ?? '';
     let vb = b[currentSort.key] ?? '';
 
-    // 🌟 針對「接待外國人」加入權重排序邏輯
+    // 🌟 針對「接待外國人」套用特殊自訂權重排序邏輯
     if (currentSort.key === 'foreign') {
-      let wa = foreignSortWeight[va] || 99; // 未定義的值放最後
+      let wa = foreignSortWeight[va] || 99; // 未定義或符號為 "—" 的排到最後面
       let wb = foreignSortWeight[vb] || 99;
       return currentSort.asc ? (wa - wb) : (wb - wa);
     }
