@@ -111,7 +111,16 @@ body {
   border-color: var(--accent);
 }
 .search-group { flex: 1; min-width: 200px; }
-.sort-group { flex-direction: row; align-items: center; gap: 6px; }
+
+/* Sort group: always full-width first row */
+.sort-group {
+  flex: 0 0 100%;
+  order: -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.sort-group label { display: none; }
 .sort-group select { min-width: 80px; }
 .btn-sort-dir {
   background: var(--bg-secondary);
@@ -412,5 +421,5 @@ td { padding: 12px 16px; vertical-align: top; }
   td:nth-child(5) { display: none; }
   .modal-content { max-width: 96%; }
   thead { top: 64px; }
-  .sort-group { flex-direction: row; align-items: center; }
+  .sort-group { order: unset; flex: 0 0 100%; flex-direction: row; align-items: center; }
 }
