@@ -4,7 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>吉原泡泡浴名店指南</title>
-  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ==========================================
+       CSS 樣式區 (原 css/style.css 的內容)
+       ========================================== */
+    :root {
+      --primary-color: #d84384;
+      --bg-color: #f4f6f9;
+      --text-color: #333;
+      --border-color: #ddd;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, "LiHei Pro", "微軟正黑體", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+    }
+
+    .site-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .site-header h1 { margin: 0; font-size: 24px; }
+    .site-header a { color: #fff; text-decoration: underline; }
+
+    .main-content {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    /* 篩選器樣式 */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      align-items: center;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group select, .filter-group input {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    .btn-sort-dir {
+      padding: 8px 12px;
+      cursor: pointer;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* 表格容器：設定最大高度並允許滾動，讓 Sticky Header 產生作用 */
+    .table-wrapper {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      max-height: 60vh; /* 限制高度產生滾動條 */
+      overflow-y: auto; 
+      position: relative;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    /* 修正表頭：固定在最上方 */
+    thead th {
+      position: sticky;
+      top: 0;               /* 固定在頂部 */
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px;
+      z-index: 10;          /* 確保不會被下方內容蓋住 */
+      cursor: pointer;      /* 提示可點擊排序 */
+      user-select: none;
+      white-space: nowrap;
+    }
+    
+    thead th:hover { filter: brightness(1.1); }
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    tbody tr:hover { background-color: #fdf5f8; }
+
+    .no-results { text-align: center; padding: 20px; color: #666; }
+    .notes-section { margin-top: 30px; background: #fff3cd; padding: 20px; border-radius: 8px; }
+    .site-footer { text-align: center; padding: 20px; margin-top: 20px; font-size: 14px; color: #777; }
+
+    /* Modal 樣式 (簡單版) */
+    .modal { position: fixed; top:0; left:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; z-index:100; }
+    .modal-backdrop { position: absolute; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    .modal-content { background:white; padding:20px; border-radius:8px; width:90%; max-width:500px; z-index:101; }
+    .modal-header { display:flex; justify-content:space-between; margin-bottom:15px; }
+    .form-group { margin-bottom:10px; display:flex; flex-direction:column; }
+    .form-group input, .form-group select, .form-group textarea { padding:8px; border:1px solid #ccc; border-radius:4px; }
+    .modal-footer { margin-top:15px; display:flex; gap:10px; justify-content:flex-end; }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -15,7 +124,6 @@
   </header>
 
   <main class="main-content">
-    <!-- Filter Bar -->
     <div class="filter-bar">
       <div class="filter-group">
         <label>店鋪類型</label>
@@ -25,8 +133,6 @@
           <option value="高級店">高級店</option>
           <option value="大眾店">大眾店</option>
           <option value="激安店">激安店</option>
-          <option value="已歇業/閉店">已歇業/閉店</option>
-          <option value="籌備中">籌備中</option>
         </select>
       </div>
       <div class="filter-group">
@@ -46,23 +152,22 @@
         <label>排序</label>
         <select id="sort-by">
           <option value="id">編號順序</option>
-          <option value="name">店名 A→Z</option>
+          <option value="name">店名</option>
           <option value="type">類型</option>
           <option value="foreign">外國人接待</option>
         </select>
         <button id="sort-dir" class="btn-sort-dir" title="切換升冪/降冪">▲</button>
       </div>
-      <div class="filter-stats">
+      <div class="filter-stats" style="margin-left: auto;">
         <span id="result-count">載入中...</span>
       </div>
     </div>
 
-    <!-- Table -->
     <div class="table-wrapper">
       <table id="shop-table">
         <thead>
           <tr>
-            <th class="col-id" data-sort="id">#</th>
+            <th class="col-id" data-sort="id"># ↕</th>
             <th class="col-name" data-sort="name">店家名稱 ↕</th>
             <th class="col-type" data-sort="type">店鋪類型 ↕</th>
             <th class="col-foreign" data-sort="foreign">外國人接待 ↕</th>
@@ -76,7 +181,6 @@
       </div>
     </div>
 
-    <!-- Notes -->
     <section class="notes-section">
       <h2>⚠️ 注意事項</h2>
       <ul>
@@ -84,70 +188,135 @@
         <li>強烈建議提前預約，人氣女孩經常滿約</li>
         <li>許多店鋪不接待外國人，少數會收取「外國人料金」或暗中縮水服務</li>
         <li>遠離街頭「咖啡店（喫茶店）」——這是專門針對外國人的中介暗所，請直接忽略拉客者</li>
-        <li>激安店主打低價，但「簡單粗暴沒服務」，外國人加價多，強烈不建議遊客前往</li>
-        <li>高級店入浴料（門票）通常在2萬日元以上，以120分鐘套餐為主</li>
-        <li>本資料來源為 YouTube 影片整理，請以最新當地資訊為準</li>
       </ul>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>資料來源：<a href="https://youtu.be/HZS4V9ik4KU" target="_blank">吉原泡泡浴名店評測影片</a> · 整理自多份用戶分析文件</p>
-  </footer>
+  <script>
+    /* ==========================================
+       JavaScript 邏輯區 (原 js/app.js 的內容)
+       ========================================== */
+    
+    // 假資料區 (替換成你的真實資料)
+    let shopsData = [
+      { id: 1, name: "櫻花亭", type: "超高級店", foreign: "✅ 接待", notes: "頂級服務，價格較高" },
+      { id: 2, name: "夢幻之城", type: "高級店", foreign: "❌ 不接待", notes: "本地客限定" },
+      { id: 3, name: "夜色", type: "大眾店", foreign: "⚠️ 不建議", notes: "外國人可能需加價" },
+      { id: 4, name: "星光俱樂部", type: "高級店", foreign: "✅ 接待", notes: "英文溝通可" },
+      { id: 5, name: "便宜泡泡", type: "激安店", foreign: "❌ 不接待", notes: "無服務品質保證" }
+    ];
 
-  <!-- Detail Modal -->
-  <div id="detail-modal" class="modal" style="display:none">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modal-title">店家詳情</h2>
-        <button class="btn-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>店家名稱</label>
-          <input type="text" id="edit-name" placeholder="店家名稱">
-        </div>
-        <div class="form-group">
-          <label>店鋪類型</label>
-          <select id="edit-type">
-            <option value="超高級店">超高級店</option>
-            <option value="高級店">高級店</option>
-            <option value="大眾店">大眾店</option>
-            <option value="激安店">激安店</option>
-            <option value="已歇業/閉店">已歇業/閉店</option>
-            <option value="籌備中">籌備中</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>外國人接待</label>
-          <select id="edit-foreign">
-            <option value="✅ 接待">✅ 接待</option>
-            <option value="❌ 不接待">❌ 不接待</option>
-            <option value="⚠️ 不建議">⚠️ 不建議</option>
-            <option value="—">—（無資料）</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>官網 / 預約連結</label>
-          <input type="url" id="edit-url" placeholder="https://...">
-        </div>
-        <div class="form-group">
-          <label>地址</label>
-          <input type="text" id="edit-address" placeholder="東京都台東區...">
-        </div>
-        <div class="form-group">
-          <label>特色與備註</label>
-          <textarea id="edit-notes" rows="4" placeholder="請輸入店家特色與備註..."></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-primary" onclick="saveShop()">💾 儲存</button>
-        <button class="btn-secondary" onclick="closeModal()">取消</button>
-      </div>
-    </div>
-  </div>
+    let currentSort = 'id';
+    let sortAsc = true;
 
-  <script src="js/app.js"></script>
+    // 定義外國人接待的排序權重：接待(1) -> 不接待(2) -> 不建議(3)
+    const foreignSortWeight = {
+      "✅ 接待": 1,
+      "❌ 不接待": 2,
+      "⚠️ 不建議": 3
+    };
+
+    // 取得 DOM 節點
+    const tbody = document.getElementById('shop-tbody');
+    const noResults = document.getElementById('no-results');
+    const resultCount = document.getElementById('result-count');
+    
+    const filterType = document.getElementById('filter-type');
+    const filterForeign = document.getElementById('filter-foreign');
+    const searchName = document.getElementById('search-name');
+    const sortBy = document.getElementById('sort-by');
+    const sortDirBtn = document.getElementById('sort-dir');
+    const tableHeaders = document.querySelectorAll('th[data-sort]');
+
+    // 初始化事件監聽
+    function init() {
+      filterType.addEventListener('change', renderTable);
+      filterForeign.addEventListener('change', renderTable);
+      searchName.addEventListener('input', renderTable);
+      
+      sortBy.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        renderTable();
+      });
+
+      sortDirBtn.addEventListener('click', () => {
+        sortAsc = !sortAsc;
+        sortDirBtn.textContent = sortAsc ? '▲' : '▼';
+        renderTable();
+      });
+
+      tableHeaders.forEach(th => {
+        th.addEventListener('click', () => {
+          const sortKey = th.getAttribute('data-sort');
+          if (currentSort === sortKey) {
+            sortAsc = !sortAsc; // 如果點同一個欄位，就反轉順序
+          } else {
+            currentSort = sortKey;
+            sortAsc = true;     // 點新欄位預設升冪
+          }
+          sortBy.value = currentSort;
+          sortDirBtn.textContent = sortAsc ? '▲' : '▼';
+          renderTable();
+        });
+      });
+
+      renderTable();
+    }
+
+    // 渲染表格的核心邏輯
+    function renderTable() {
+      // 1. 條件過濾
+      let filtered = shopsData.filter(shop => {
+        const matchType = filterType.value === "" || shop.type === filterType.value;
+        const matchForeign = filterForeign.value === "" || shop.foreign === filterForeign.value;
+        const matchName = shop.name.toLowerCase().includes(searchName.value.toLowerCase());
+        return matchType && matchForeign && matchName;
+      });
+
+      // 2. 執行排序
+      filtered.sort((a, b) => {
+        let valA = a[currentSort];
+        let valB = b[currentSort];
+
+        // 🌟 針對「接待外國人」套用特殊權重邏輯
+        if (currentSort === 'foreign') {
+          let weightA = foreignSortWeight[valA] || 99;
+          let weightB = foreignSortWeight[valB] || 99;
+          return sortAsc ? (weightA - weightB) : (weightB - weightA);
+        }
+
+        // 一般數字與字串邏輯
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+        return sortAsc ? (valA - valB) : (valB - valA);
+      });
+
+      // 3. 輸出至畫面
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        noResults.style.display = 'block';
+        table.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        filtered.forEach(shop => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${shop.id}</td>
+            <td>${shop.name}</td>
+            <td>${shop.type}</td>
+            <td>${shop.foreign}</td>
+            <td>${shop.notes}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      
+      resultCount.textContent = `共 ${filtered.length} 筆資料`;
+    }
+
+    // 啟動程式
+    init();
+  </script>
 </body>
 </html>
