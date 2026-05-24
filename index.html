@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>吉原泡泡浴名店指南</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1>🗾 東京吉原泡泡浴名店指南</h1>
+      <p class="subtitle">2026 最新整理 · 影片來源：<a href="https://youtu.be/HZS4V9ik4KU" target="_blank">youtu.be/HZS4V9ik4KU</a></p>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>店鋪類型</label>
+        <select id="filter-type">
+          <option value="">全部</option>
+          <option value="超高級店">超高級店</option>
+          <option value="高級店">高級店</option>
+          <option value="大眾店">大眾店</option>
+          <option value="激安店">激安店</option>
+          <option value="已歇業/閉店">已歇業/閉店</option>
+          <option value="籌備中">籌備中</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>接待外國人</label>
+        <select id="filter-foreign">
+          <option value="">全部</option>
+          <option value="✅ 接待">✅ 接待</option>
+          <option value="❌ 不接待">❌ 不接待</option>
+          <option value="⚠️ 不建議">⚠️ 不建議</option>
+        </select>
+      </div>
+      <div class="filter-group search-group">
+        <label>搜尋店名</label>
+        <input type="text" id="search-name" placeholder="搜尋店名...">
+      </div>
+      <div class="filter-group sort-group">
+        <label>排序</label>
+        <select id="sort-by">
+          <option value="id">編號順序</option>
+          <option value="name">店名 A→Z</option>
+          <option value="type">類型</option>
+          <option value="foreign">外國人接待</option>
+        </select>
+        <button id="sort-dir" class="btn-sort-dir" title="切換升冪/降冪">▲</button>
+      </div>
+      <div class="filter-stats">
+        <span id="result-count">載入中...</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table id="shop-table">
+        <thead>
+          <tr>
+            <th class="col-id" data-sort="id">#</th>
+            <th class="col-name" data-sort="name">店家名稱 ↕</th>
+            <th class="col-type" data-sort="type">店鋪類型 ↕</th>
+            <th class="col-foreign" data-sort="foreign">外國人接待 ↕</th>
+            <th class="col-notes">特色與備註</th>
+          </tr>
+        </thead>
+        <tbody id="shop-tbody"></tbody>
+      </table>
+      <div id="no-results" class="no-results" style="display:none">
+        <p>❌ 沒有找到符合條件的店鋪</p>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <section class="notes-section">
+      <h2>⚠️ 注意事項</h2>
+      <ul>
+        <li>所有店鋪最晚營業至凌晨12點，建議提早安排行程</li>
+        <li>強烈建議提前預約，人氣女孩經常滿約</li>
+        <li>許多店鋪不接待外國人，少數會收取「外國人料金」或暗中縮水服務</li>
+        <li>遠離街頭「咖啡店（喫茶店）」——這是專門針對外國人的中介暗所，請直接忽略拉客者</li>
+        <li>激安店主打低價，但「簡單粗暴沒服務」，外國人加價多，強烈不建議遊客前往</li>
+        <li>高級店入浴料（門票）通常在2萬日元以上，以120分鐘套餐為主</li>
+        <li>本資料來源為 YouTube 影片整理，請以最新當地資訊為準</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>資料來源：<a href="https://youtu.be/HZS4V9ik4KU" target="_blank">吉原泡泡浴名店評測影片</a> · 整理自多份用戶分析文件</p>
+  </footer>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">店家詳情</h2>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>店家名稱</label>
+          <input type="text" id="edit-name" placeholder="店家名稱">
+        </div>
+        <div class="form-group">
+          <label>店鋪類型</label>
+          <input type="text" id="edit-type" readonly>
+        </div>
+        <div class="form-group">
+          <label>外國人接待</label>
+          <input type="text" id="edit-foreign" readonly>
+        </div>
+        <div class="form-group">
+          <label>官網 / 預約連結</label>
+          <input type="url" id="edit-url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label>地址</label>
+          <input type="text" id="edit-address" placeholder="東京都台東區...">
+        </div>
+        <div class="form-group">
+          <label>特色與備註</label>
+          <textarea id="edit-notes" rows="4" readonly></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="saveShop()">💾 儲存</button>
+        <button class="btn-secondary" onclick="closeModal()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
