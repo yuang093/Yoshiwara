@@ -110,11 +110,23 @@
         </div>
         <div class="form-group">
           <label>店鋪類型</label>
-          <input type="text" id="edit-type" readonly>
+          <select id="edit-type">
+            <option value="超高級店">超高級店</option>
+            <option value="高級店">高級店</option>
+            <option value="大眾店">大眾店</option>
+            <option value="激安店">激安店</option>
+            <option value="已歇業/閉店">已歇業/閉店</option>
+            <option value="籌備中">籌備中</option>
+          </select>
         </div>
         <div class="form-group">
           <label>外國人接待</label>
-          <input type="text" id="edit-foreign" readonly>
+          <select id="edit-foreign">
+            <option value="✅ 接待">✅ 接待</option>
+            <option value="❌ 不接待">❌ 不接待</option>
+            <option value="⚠️ 不建議">⚠️ 不建議</option>
+            <option value="—">—（無資料）</option>
+          </select>
         </div>
         <div class="form-group">
           <label>官網 / 預約連結</label>
@@ -126,7 +138,7 @@
         </div>
         <div class="form-group">
           <label>特色與備註</label>
-          <textarea id="edit-notes" rows="4" readonly></textarea>
+          <textarea id="edit-notes" rows="4" placeholder="請輸入店家特色與備註..."></textarea>
         </div>
       </div>
       <div class="modal-footer">

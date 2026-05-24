@@ -27,12 +27,15 @@ function loadShops() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
-          const overrides = JSON.parse(saved); // { id: { name, url, address } }
+          const overrides = JSON.parse(saved); // { id: { name, type, foreign, url, address, notes } }
           data = data.map(s => ({
             ...s,
             name: overrides[s.id]?.name ?? s.name,
+            type: overrides[s.id]?.type ?? s.type,
+            foreign: overrides[s.id]?.foreign ?? s.foreign,
             url: overrides[s.id]?.url ?? s.url,
             address: overrides[s.id]?.address ?? s.address,
+            notes: overrides[s.id]?.notes ?? s.notes,
           }));
         } catch(e) { console.warn('localStorage parse error', e); }
       }
@@ -234,10 +237,6 @@ function openModal(id) {
   document.getElementById('edit-address').value = s.address || '';
   document.getElementById('edit-notes').value = s.notes;
 
-  // Make name editable only
-  const nameInput = document.getElementById('edit-name');
-  nameInput.readOnly = false;
-
   document.getElementById('detail-modal').style.display = 'flex';
 }
 
@@ -249,22 +248,28 @@ function closeModal() {
 function saveShop() {
   if (!currentShopId) return;
   const name = document.getElementById('edit-name').value.trim();
+  const type = document.getElementById('edit-type').value;
+  const foreign = document.getElementById('edit-foreign').value;
   const url = document.getElementById('edit-url').value.trim();
   const address = document.getElementById('edit-address').value.trim();
+  const notes = document.getElementById('edit-notes').value.trim();
 
   const s = allShops.find(x => x.id === currentShopId);
   if (!s) return;
 
   s.name = name || s.name;
+  s.type = type;
+  s.foreign = foreign;
   s.url = url;
   s.address = address;
+  s.notes = notes;
 
   saveOverrides(s);
 
   // Update localStorage saved name for display
   const saved = localStorage.getItem(STORAGE_KEY);
   const overrides = saved ? JSON.parse(saved) : {};
-  overrides[s.id] = { name: s.name, url: s.url, address: s.address };
+  overrides[s.id] = { name: s.name, type: s.type, foreign: s.foreign, url: s.url, address: s.address, notes: s.notes };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
 
   // Re-apply filter/sort
