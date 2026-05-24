@@ -148,7 +148,9 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
+  max-height: 65vh;     /* 限制表格最大高度，使滾動條限制在表格內部 */
+  overflow-y: auto;     /* 允許垂直滾動 */
+  position: relative;   /* 提供 sticky 完美的定位基準點 */
   box-shadow: var(--shadow);
 }
 table {
@@ -157,12 +159,12 @@ table {
   font-size: 0.9rem;
 }
 thead {
-  background: var(--bg-header);
   position: sticky;
-  top: 148px;
+  top: 0;               /* 穩穩黏定在 .table-wrapper 容器的最頂端 */
   z-index: 50;
 }
 thead th {
+  background: var(--bg-header); /* 將背景色套用至 th，確保滾動時下層文字完全被遮蔽 */
   padding: 12px 16px;
   text-align: left;
   font-size: 0.78rem;
@@ -420,6 +422,6 @@ td { padding: 12px 16px; vertical-align: top; }
   thead th:nth-child(5) { display: none; }
   td:nth-child(5) { display: none; }
   .modal-content { max-width: 96%; }
-  thead { top: 120px; }
+  thead { top: 0; }
   .sort-group { order: unset; flex: 0 0 100%; flex-direction: row; align-items: center; }
 }
