@@ -422,6 +422,77 @@ td { padding: 12px 16px; vertical-align: top; }
 }
 .btn-secondary:hover { border-color: var(--accent); }
 
+/* ---- Modal Detail View ---- */
+.detail-view {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.detail-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: flex-start;
+}
+.detail-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 3px;
+}
+.detail-value {
+  color: var(--text-primary);
+  line-height: 1.55;
+  word-break: break-all;
+}
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0 20px;
+}
+.edit-title {
+  font-size: 0.95em;
+  color: var(--accent);
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+.edit-panel {
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  justify-content: flex-end;
+}
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+  padding: 9px 22px;
+  border-radius: 6px;
+  font-size: 0.92em;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  font-family: var(--font-main);
+}
+.modal-footer .btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.modal-footer .btn-primary:hover { background: var(--accent-hover); }
+.modal-footer .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.modal-footer .btn-secondary:hover { border-color: var(--accent); }
+
 /* ---- Toast ---- */
 .toast {
   position: fixed;

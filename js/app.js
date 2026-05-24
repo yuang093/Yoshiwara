@@ -126,6 +126,7 @@ let filtered = [];
 let currentSort = { key: 'id', asc: true };
 let currentFilters = { type: '', foreign: '', search: '' };
 let currentShopId = null;
+let isAdmin = sessionStorage.getItem('yoshiwara_admin') === '1';
 
 // 外國人接待的自訂排序權重 (數字越小排越前面)
 const foreignSortWeight = {
@@ -138,6 +139,7 @@ const foreignSortWeight = {
 document.addEventListener('DOMContentLoaded', () => {
   loadShops();
   bindEvents();
+  updateAdminUI(); // 初始化管理者 UI
   render();
 });
 
@@ -348,12 +350,29 @@ function openModal(id) {
   currentShopId = id;
 
   document.getElementById('modal-title').textContent = s.name;
-  document.getElementById('edit-name').value = s.name;
-  document.getElementById('edit-type').value = s.type;
-  document.getElementById('edit-foreign').value = s.foreign;
-  document.getElementById('edit-url').value = s.url || '';
-  document.getElementById('edit-address').value = s.address || '';
-  document.getElementById('edit-notes').value = s.notes;
+
+  // 詳細檢視（所有人均可看）
+  document.getElementById('detail-name').textContent = s.name;
+  document.getElementById('detail-type').textContent = s.type;
+  document.getElementById('detail-foreign').textContent = s.foreign;
+  document.getElementById('detail-url').textContent = s.url || '（無資料）';
+  document.getElementById('detail-address').textContent = s.address || '（無資料）';
+  document.getElementById('detail-notes').textContent = s.notes || '（無資料）';
+
+  // 管理者才能看到編輯表單
+  if (isAdmin) {
+    document.getElementById('edit-name').value = s.name;
+    document.getElementById('edit-type').value = s.type;
+    document.getElementById('edit-foreign').value = s.foreign;
+    document.getElementById('edit-url').value = s.url || '';
+    document.getElementById('edit-address').value = s.address || '';
+    document.getElementById('edit-notes').value = s.notes;
+    document.getElementById('edit-panel').style.display = '';
+    document.getElementById('modal-save-btn').style.display = '';
+  } else {
+    document.getElementById('edit-panel').style.display = 'none';
+    document.getElementById('modal-save-btn').style.display = 'none';
+  }
 
   document.getElementById('detail-modal').style.display = 'flex';
 }
@@ -488,4 +507,39 @@ function importCSV(input) {
   };
   reader.readAsText(file, 'UTF-8');
   input.value = '';
+}
+
+// ---- Admin Auth ----
+function showLogin() {
+  const pw = prompt('請輸入管理者密碼：');
+  if (!pw) return;
+  if (pw === 'sex') {
+    isAdmin = true;
+    sessionStorage.setItem('yoshiwara_admin', '1');
+    updateAdminUI();
+    showToast('🔓 已進入管理模式');
+  } else {
+    showToast('❌ 密碼錯誤', true);
+  }
+}
+
+function logout() {
+  isAdmin = false;
+  sessionStorage.removeItem('yoshiwara_admin');
+  updateAdminUI();
+  showToast('🔒 已登出');
+}
+
+function updateAdminUI() {
+  const btn = document.getElementById('btn-admin');
+  if (!btn) return;
+  if (isAdmin) {
+    btn.textContent = '🔒 登出';
+    btn.onclick = logout;
+    document.getElementById('edit-panel').style.display = '';
+  } else {
+    btn.textContent = '🔑 管理';
+    btn.onclick = showLogin;
+    document.getElementById('edit-panel').style.display = 'none';
+  }
 }
