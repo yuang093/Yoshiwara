@@ -1,19 +1,10 @@
-資料沒有成功帶入，是因為你直接在電腦上雙擊打開 `index.html` 檔案時，瀏覽器的安全機制（CORS 政策）會**阻擋 JavaScript 使用 `fetch()` 函數去讀取本地端的另一個檔案（`shops.json`）**。
-
-為了解決這個本地端讀取限制，並且讓你不用額外架設伺服器就能直接點開網頁查看，**最乾脆的解法是直接把 JSON 資料「內嵌」到 JavaScript 檔案裡面**。
-
-我已經幫你把 `shops.json` 的資料、原本的邏輯，以及「外國人接待」的自訂排序權重全部整合進了 `app.js`。
-
-請直接複製以下所有程式碼，**完全覆蓋**你原本的 `js/app.js` 檔案，然後重新整理網頁即可：
-
-```javascript
 // ============================================
 // 吉原泡泡浴名店指南 - App JS
 // ============================================
 
 const STORAGE_KEY = 'yoshiwara_shops_v1';
 
-// 🌟 直接將 JSON 資料寫入陣列，避開本地端 fetch 造成的 CORS 讀取失敗問題
+// 🌟 直接將 JSON 資料寫入陣列
 const rawShopsData = [
   { "id": 1, "name": "西月", "type": "超高級店", "foreign": "❌ 不接待", "notes": "吉原三大名店之一，和式裝修，品質和服務極穩，安檢嚴格，黑服態度一般，不接待外國人", "url": "", "address": "" },
   { "id": 2, "name": "將軍", "type": "超高級店", "foreign": "—", "notes": "外觀平平無奇但價格昂貴（60分鐘入浴料需4萬9日元），完全預約制。老師招募極嚴格（排除抽菸、紋身、有疤痕及超過29歲的人）", "url": "", "address": "" },
@@ -152,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ---- Data ----
 function loadShops() {
-  // 🌟 改為直接讀取上面定義好的 rawShopsData 變數
   let data = [...rawShopsData];
   
   // Merge with localStorage overrides
@@ -416,5 +406,3 @@ function showToast(msg, isError = false) {
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 2500);
 }
-
-```
