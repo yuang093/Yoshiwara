@@ -406,3 +406,86 @@ function showToast(msg, isError = false) {
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 2500);
 }
+
+// ---- CSV Export / Import ----
+function exportCSV() {
+  const rows = [['id', 'name', 'type', 'foreign', 'url', 'address', 'notes']];
+  allShops.forEach(s => {
+    rows.push([
+      s.id,
+      s.name,
+      s.type,
+      s.foreign,
+      s.url || '',
+      s.address || '',
+      (s.notes || '').replace(/\n/g, ' '),
+    ]);
+  });
+  const csv = rows.map(r =>
+    r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `yoshiwara_backup_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ CSV 已匯出');
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const lines = text.split('\n').filter(l => l.trim());
+      if (lines.length < 2) { showToast('❌ CSV 格式錯誤', true); return; }
+      const parseRow = line => {
+        const result = [];
+        let cur = '';
+        let inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
+            else inQuote = !inQuote;
+          } else if (ch === ',' && !inQuote) {
+            result.push(cur.trim());
+            cur = '';
+          } else cur += ch;
+        }
+        result.push(cur.trim());
+        return result;
+      };
+      parseRow(lines[0]); // header
+      const data = {};
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseRow(lines[i]);
+        if (cols.length < 2) continue;
+        const id = parseInt(cols[0]);
+        if (!id) continue;
+        data[id] = {
+          name: cols[1] || '',
+          type: cols[2] || '',
+          foreign: cols[3] || '',
+          url: cols[4] || '',
+          address: cols[5] || '',
+          notes: (cols[6] || '').replace(/\\n/g, '\n'),
+        };
+      }
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const overrides = saved ? JSON.parse(saved) : {};
+      Object.assign(overrides, data);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+      location.reload();
+    } catch(err) {
+      console.error(err);
+      showToast('❌ 匯入失敗：' + err.message, true);
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  input.value = '';
+}

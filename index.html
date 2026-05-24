@@ -9,8 +9,19 @@
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <h1>🗾 東京吉原泡泡浴名店指南</h1>
-      <p class="subtitle">2026 最新整理 · 影片來源：<a href="https://youtu.be/HZS4V9ik4KU" target="_blank">youtu.be/HZS4V9ik4KU</a></p>
+      <div class="header-top">
+        <div class="header-title">
+          <h1>🗾 東京吉原泡泡浴名店指南</h1>
+          <p class="subtitle">2026 最新整理 · 影片來源：<a href="https://youtu.be/HZS4V9ik4KU" target="_blank">youtu.be/HZS4V9ik4KU</a></p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-donate" onclick="exportCSV()" title="匯出CSV備份">📤 匯出CSV</button>
+          <label class="btn-donate" title="匯入CSV還原">📥 匯入CSV
+            <input type="file" id="csv-import" accept=".csv" style="display:none" onchange="importCSV(this)">
+          </label>
+          <a class="btn-donate" href="https://service.jkopay.com/r/transfer?j=Transfer:901055756" target="_blank">❤️ 斗內</a>
+        </div>
+      </div>
     </div>
   </header>
 
