@@ -11,6 +11,13 @@ let currentSort = { key: 'id', asc: true };
 let currentFilters = { type: '', foreign: '', search: '' };
 let currentShopId = null;
 
+// 外國人接待的排序權重 (數字越小排越前面)
+const foreignSortWeight = {
+  "✅ 接待": 1,
+  "❌ 不接待": 3,
+  "⚠️ 不建議": 2
+};
+
 // ---- Init ----
 document.addEventListener('DOMContentLoaded', () => {
   loadShops();
@@ -137,6 +144,15 @@ function applyFilters() {
   filtered.sort((a, b) => {
     let va = a[currentSort.key] ?? '';
     let vb = b[currentSort.key] ?? '';
+
+    // 🌟 針對「接待外國人」加入權重排序邏輯
+    if (currentSort.key === 'foreign') {
+      let wa = foreignSortWeight[va] || 99; // 未定義的值放最後
+      let wb = foreignSortWeight[vb] || 99;
+      return currentSort.asc ? (wa - wb) : (wb - wa);
+    }
+
+    // 一般字串或數字排序邏輯
     if (typeof va === 'string') va = va.toLowerCase();
     if (typeof vb === 'string') vb = vb.toLowerCase();
     if (va < vb) return currentSort.asc ? -1 : 1;
