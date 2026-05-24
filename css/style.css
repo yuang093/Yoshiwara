@@ -447,6 +447,15 @@ td { padding: 12px 16px; vertical-align: top; }
   line-height: 1.55;
   word-break: break-all;
 }
+.detail-link {
+  color: var(--accent);
+  text-decoration: none;
+  word-break: break-all;
+}
+.detail-link:hover {
+  text-decoration: underline;
+  color: var(--accent-hover);
+}
 .modal-divider {
   border: none;
   border-top: 1px solid var(--border);

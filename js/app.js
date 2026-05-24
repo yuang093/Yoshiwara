@@ -355,7 +355,9 @@ function openModal(id) {
   document.getElementById('detail-name').textContent = s.name;
   document.getElementById('detail-type').textContent = s.type;
   document.getElementById('detail-foreign').textContent = s.foreign;
-  document.getElementById('detail-url').textContent = s.url || '（無資料）';
+  document.getElementById('detail-url').innerHTML = s.url
+    ? `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="detail-link">${s.url}</a>`
+    : '（無資料）';
   document.getElementById('detail-address').textContent = s.address || '（無資料）';
   document.getElementById('detail-notes').textContent = s.notes || '（無資料）';
 
