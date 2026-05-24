@@ -130,8 +130,8 @@ let currentShopId = null;
 // 外國人接待的自訂排序權重 (數字越小排越前面)
 const foreignSortWeight = {
   "✅ 接待": 1,
-  "❌ 不接待": 2,
-  "⚠️ 不建議": 3
+  "❌ 不接待": 3,
+  "⚠️ 不建議": 2
 };
 
 // ---- Init ----
